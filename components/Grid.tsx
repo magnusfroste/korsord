@@ -94,12 +94,22 @@ export const Grid: React.FC<GridProps> = ({
       if (isAnyWordSolved) content = cellData.char; // Force correct char if word is solved
     }
 
+    // Check for error (Only in typing/letter modes, if input exists, doesn't match, and isn't already solved)
+    const isError = mode !== GameMode.DRAG_WORDS && 
+                    userInput && 
+                    userInput !== cellData.char && 
+                    !isAnyWordSolved;
+
     // Determine cell styling
     let cellStyleClass = "bg-white border-2 border-slate-300 shadow-sm z-0";
     let textColorClass = "text-slate-700";
     let animationStyle = {};
 
-    if (isActive) {
+    if (isError) {
+        // Error state: Red, shake animation
+        cellStyleClass = "bg-red-50 border-red-400 animate-shake z-20";
+        textColorClass = "text-red-500";
+    } else if (isActive) {
         // High priority: Active editing
         // Distinct background color and thicker border
         cellStyleClass = "bg-brand-light border-4 border-brand shadow-lg scale-105 z-10 transition-transform duration-200";
@@ -198,6 +208,15 @@ export const Grid: React.FC<GridProps> = ({
           animation: smooth-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
           /* Ensure the final state persists */
           background-color: #bbf7d0; 
+        }
+        
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+          20%, 40%, 60%, 80% { transform: translateX(4px); }
+        }
+        .animate-shake {
+          animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
         }
       `}</style>
       <div 
