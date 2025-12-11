@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { generatePuzzle } from './services/geminiService';
 import { GameMode, AgeGroup, PuzzleData, UserProgress, DifficultyLevel } from './types';
 import { Grid } from './components/Grid';
 import { DraggableWord } from './components/DraggableWord';
 import { Button } from './components/ui/Button';
-import { Trophy, Star, ArrowLeft, Settings, Play, Brain, Sparkles, Zap, Eye, EyeOff, HelpCircle, History, Lightbulb } from 'lucide-react';
+import { Trophy, Star, ArrowLeft, Settings, Play, Brain, Sparkles, Zap, Eye, EyeOff, HelpCircle, History, Lightbulb, Info, RotateCcw } from 'lucide-react';
 
 // --- Constants ---
 const INITIAL_PROGRESS: UserProgress = {
@@ -17,6 +17,23 @@ const INITIAL_PROGRESS: UserProgress = {
 
 const SAVED_GAME_KEY = 'korsord_saved_game';
 const HINT_COST = 10;
+
+// Simple seeded shuffle to keep letters consistent during re-renders
+const seededShuffle = (string: string, seed: string) => {
+  const array = string.split('');
+  let m = array.length, t, i;
+  let seedNum = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  
+  while (m) {
+    i = Math.floor((seedNum * m) % m); // Simple pseudo-random
+    m--;
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+    seedNum++; 
+  }
+  return array;
+};
 
 export default function App() {
   // --- Global State ---
@@ -38,6 +55,9 @@ export default function App() {
   
   // State to track if a saved game exists
   const [hasSavedGame, setHasSavedGame] = useState(false);
+  
+  // State for teacher info toggle
+  const [showInfo, setShowInfo] = useState(false);
 
   // Determine mode based on Age
   const getMode = (age: AgeGroup): GameMode => {
@@ -131,6 +151,27 @@ export default function App() {
       }
   };
 
+  const handleRestart = () => {
+    if (window.confirm("Vill du börja om detta korsord? Alla framsteg på denna nivå försvinner.")) {
+      setSolvedWords([]);
+      setUserInputs({});
+      setActiveWordId(null);
+      
+      // Update saved game immediately to reflect reset
+      if (puzzle) {
+        const gameState = {
+            puzzle,
+            solvedWords: [],
+            userInputs: {},
+            currentAge,
+            difficulty,
+            timestamp: Date.now()
+        };
+        localStorage.setItem(SAVED_GAME_KEY, JSON.stringify(gameState));
+      }
+    }
+  };
+
   const handleWin = () => {
     setView('WIN');
     
@@ -202,7 +243,7 @@ export default function App() {
             setActiveWordId(null);
         }
     } else {
-        // In typing mode, find the first missing or incorrect letter
+        // In typing/letter mode, find the first missing or incorrect letter
         let targetCoord = null;
         let charToFill = '';
 
@@ -225,38 +266,38 @@ export default function App() {
             setProgress(prev => ({ ...prev, coins: prev.coins - HINT_COST }));
 
             // Check if word is now complete
-            let isWordCorrect = true;
-            for(let i=0; i<word.word.length; i++) {
-                const r = word.direction === 'across' ? word.row : word.row + i;
-                const c = word.direction === 'across' ? word.col + i : word.col;
-                const k = `${r}-${c}`;
-                if (newInputs[k] !== word.word[i]) {
-                    isWordCorrect = false;
-                    break;
-                }
-            }
-
-            if (isWordCorrect) {
-                setSolvedWords(prev => [...prev, word.id]);
-                setActiveWordId(null);
-            }
+            checkWordCompletion(word, newInputs);
         }
     }
   };
 
+  const checkWordCompletion = (word: any, inputs: Record<string, string>) => {
+        let isWordCorrect = true;
+        for(let i=0; i<word.word.length; i++) {
+            const r = word.direction === 'across' ? word.row : word.row + i;
+            const c = word.direction === 'across' ? word.col + i : word.col;
+            const k = `${r}-${c}`;
+            if (inputs[k] !== word.word[i]) {
+                isWordCorrect = false;
+                break;
+            }
+        }
+
+        if (isWordCorrect) {
+            setSolvedWords(prev => [...prev, word.id]);
+            setActiveWordId(null);
+        }
+  };
+
   const handleVirtualKey = (char: string) => {
       if (!activeWordId || !puzzle) return;
-      // Simple logic: find first empty cell in active word
       const word = puzzle.words.find(w => w.id === activeWordId);
       if (!word) return;
-
-      // Check if word is already solved logic could go here, but we allow overwriting for correction
       
       let targetR = -1;
       let targetC = -1;
 
-      // Find first empty or just fill next logical?
-      // For simplicity in this demo: we find the first empty spot in the active word.
+      // Find first empty spot in the active word
       for (let i = 0; i < word.word.length; i++) {
           const r = word.direction === 'across' ? word.row : word.row + i;
           const c = word.direction === 'across' ? word.col + i : word.col;
@@ -268,31 +309,33 @@ export default function App() {
           }
       }
 
-      // If full, maybe just overwrite the last one or do nothing? 
-      // Let's keep it simple: if full, do nothing unless user clicks specific cell (not implemented deeply here)
+      // If no empty spots, do nothing (or overwrite logic could be added here)
       if (targetR !== -1) {
           const key = `${targetR}-${targetC}`;
           const newInputs = { ...userInputs, [key]: char };
           setUserInputs(newInputs);
-
-          // Check if word is now complete and correct
-          let isWordCorrect = true;
-          for(let i=0; i<word.word.length; i++) {
-             const r = word.direction === 'across' ? word.row : word.row + i;
-             const c = word.direction === 'across' ? word.col + i : word.col;
-             const k = `${r}-${c}`;
-             if (newInputs[k] !== word.word[i]) {
-                 isWordCorrect = false;
-                 break;
-             }
-          }
-
-          if (isWordCorrect) {
-              setSolvedWords(prev => [...prev, word.id]);
-              setActiveWordId(null); // Deselect
-          }
+          checkWordCompletion(word, newInputs);
       }
   };
+
+  // Helper for scrambled letters mode (8-10 years)
+  // Counts how many of each char are already placed correctly in the active word
+  // to avoid greying out all 'A's if only one is placed.
+  const getUsedCharCounts = (word: any) => {
+      const counts: Record<string, number> = {};
+      if (!word) return counts;
+      
+      for(let i=0; i<word.word.length; i++) {
+         const r = word.direction === 'across' ? word.row : word.row + i;
+         const c = word.direction === 'across' ? word.col + i : word.col;
+         const key = `${r}-${c}`;
+         const val = userInputs[key];
+         if (val) {
+             counts[val] = (counts[val] || 0) + 1;
+         }
+      }
+      return counts;
+  }
 
   const getDifficultyDescription = (level: DifficultyLevel) => {
     switch(level) {
@@ -308,13 +351,22 @@ export default function App() {
   if (view === 'HOME') {
     return (
       <div className="min-h-screen bg-brand-light flex flex-col items-center p-4 overflow-y-auto">
-        <header className="w-full max-w-2xl flex justify-between items-center mb-8 bg-white p-4 rounded-3xl shadow-lg">
+        <header className="w-full max-w-2xl flex justify-between items-center mb-6 bg-white p-4 rounded-3xl shadow-lg relative">
            <div className="flex items-center gap-3">
                <div className="w-12 h-12 bg-accent-yellow rounded-full flex items-center justify-center border-4 border-orange-200">
                    <Brain className="text-orange-600" size={24} />
                </div>
                <div>
-                   <h1 className="text-xl font-black text-brand-dark leading-none">Korsords</h1>
+                   <div className="flex items-center gap-2">
+                     <h1 className="text-xl font-black text-brand-dark leading-none">Korsords</h1>
+                     <button 
+                        onClick={() => setShowInfo(!showInfo)}
+                        className="p-1 text-slate-400 hover:text-brand transition-colors rounded-full hover:bg-slate-100"
+                        title="Om spelet (För vuxna)"
+                     >
+                         <Info size={18} />
+                     </button>
+                   </div>
                    <span className="text-brand font-bold text-sm">Äventyret</span>
                </div>
            </div>
@@ -335,6 +387,29 @@ export default function App() {
         </header>
 
         <div className="w-full max-w-2xl space-y-6">
+            {/* Teacher/Parent Info Box */}
+            {showInfo && (
+                <div className="bg-white/80 border border-brand/20 p-5 rounded-3xl backdrop-blur-sm animate-[fadeIn_0.3s_ease-out]">
+                    <h4 className="font-black text-brand-dark mb-2 flex items-center gap-2">
+                        <Sparkles size={16} className="text-accent-yellow" />
+                        Pedagogisk Översikt
+                    </h4>
+                    <ul className="space-y-2 text-sm text-slate-700 font-medium leading-relaxed">
+                        <li className="flex gap-2">
+                            <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full h-fit mt-0.5">6-8 år</span>
+                            <span>Tränar ordförståelse genom att para ihop bilder med ord (Dra & Släpp).</span>
+                        </li>
+                        <li className="flex gap-2">
+                            <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full h-fit mt-0.5">8-10 år</span>
+                            <span>Tränar stavning. Barnet bygger ord av blandade bokstäver (Scrambled letters).</span>
+                        </li>
+                        <li className="flex gap-2">
+                            <span className="text-xs font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full h-fit mt-0.5">10+ år</span>
+                            <span>Traditionell korsordslösning med tangentbord. Utvecklar ordförråd och logik.</span>
+                        </li>
+                    </ul>
+                </div>
+            )}
 
             {/* Resume Button if game exists */}
             {hasSavedGame && (
@@ -436,6 +511,35 @@ export default function App() {
           <div className="min-h-screen bg-accent-yellow flex flex-col items-center justify-center p-4 relative overflow-hidden">
               <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent" />
               
+              {/* Confetti CSS */}
+              <style>{`
+                @keyframes confetti-fall {
+                  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+                  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+                }
+                .confetti {
+                  position: absolute;
+                  top: -10px;
+                  width: 10px;
+                  height: 10px;
+                  animation: confetti-fall 4s linear infinite;
+                }
+              `}</style>
+              
+              {/* Confetti Elements */}
+              {Array.from({ length: 50 }).map((_, i) => (
+                  <div 
+                    key={i}
+                    className="confetti"
+                    style={{
+                        left: `${Math.random() * 100}%`,
+                        backgroundColor: ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#a78bfa'][Math.floor(Math.random() * 5)],
+                        animationDelay: `${Math.random() * 3}s`,
+                        animationDuration: `${2 + Math.random() * 3}s`
+                    }}
+                  />
+              ))}
+              
               <div className="z-10 bg-white p-8 rounded-3xl shadow-2xl text-center max-w-md w-full animate-bounce-slow">
                   <div className="flex justify-center -mt-20 mb-6">
                       <div className="bg-brand text-white p-6 rounded-full shadow-lg border-4 border-white">
@@ -518,6 +622,14 @@ export default function App() {
             >
                 {showSolvedHighlight ? <Eye size={20} /> : <EyeOff size={20} />}
             </button>
+
+            <button
+               onClick={handleRestart}
+               className="p-2 rounded-full transition-colors border-2 shadow-sm bg-white border-slate-200 text-slate-400 hover:text-brand hover:border-brand"
+               title="Börja om"
+            >
+                <RotateCcw size={20} />
+            </button>
          </div>
       </div>
 
@@ -531,7 +643,10 @@ export default function App() {
                 <p className="text-brand-dark font-medium leading-relaxed">
                     {mode === GameMode.DRAG_WORDS 
                         ? "Dra bilderna till rätt plats i rutnätet!" 
-                        : "Klicka på en rad och skriv ordet!"}
+                        : (mode === GameMode.DRAG_LETTERS 
+                            ? "Bygg ordet med bokstäverna!"
+                            : "Klicka på en rad och skriv ordet!")
+                    }
                 </p>
             </div>
 
@@ -542,7 +657,7 @@ export default function App() {
                         <div className="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-full shadow-sm">
                             <HelpCircle size={10} className="text-slate-500"/>
                             <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wide">
-                                {mode === GameMode.DRAG_WORDS ? "Dra rätt bild hit" : "Skriv ordet här"}
+                                {mode === GameMode.DRAG_WORDS ? "Dra rätt bild hit" : "Lösningen"}
                             </span>
                         </div>
                      </div>
@@ -593,9 +708,55 @@ export default function App() {
 
       </div>
 
-      {/* Bottom: Virtual Keyboard (for typing modes) */}
-      {mode !== GameMode.DRAG_WORDS && (
-          <div className="bg-white p-2 pb-6 border-t border-slate-200 shrink-0">
+      {/* Bottom Area: Controls vary by mode */}
+      <div className="bg-white p-2 pb-6 border-t border-slate-200 shrink-0">
+          
+          {/* Case 1: Drag Letters Mode (Scrambled Letters) */}
+          {mode === GameMode.DRAG_LETTERS && activeWordId && puzzle && (
+             <div className="max-w-2xl mx-auto">
+                 <div className="flex flex-wrap justify-center gap-2">
+                    {(() => {
+                        const word = puzzle.words.find(w => w.id === activeWordId);
+                        if (!word) return null;
+                        
+                        // We use a seeded shuffle based on Word ID so letters don't jump around on re-renders
+                        const shuffledLetters = seededShuffle(word.word, word.id);
+                        const usedCounts = getUsedCharCounts(word);
+                        const charRenderCounts: Record<string, number> = {};
+
+                        return shuffledLetters.map((char, idx) => {
+                            // Track how many times we've rendered this specific char
+                            const currentRenderCount = (charRenderCounts[char] || 0) + 1;
+                            charRenderCounts[char] = currentRenderCount;
+                            
+                            // Check if this specific instance is "used"
+                            const isUsed = currentRenderCount <= (usedCounts[char] || 0);
+
+                            return (
+                                <button
+                                    key={`${word.id}-${char}-${idx}`}
+                                    onClick={() => !isUsed && handleVirtualKey(char)}
+                                    disabled={isUsed}
+                                    className={`
+                                        w-12 h-12 md:w-14 md:h-14 rounded-xl shadow-md text-2xl font-black transition-all transform
+                                        ${isUsed 
+                                            ? 'bg-slate-100 text-slate-300 scale-90 shadow-none' 
+                                            : 'bg-white border-b-4 border-blue-200 text-blue-600 hover:-translate-y-1 hover:border-blue-300'
+                                        }
+                                    `}
+                                >
+                                    {char}
+                                </button>
+                            );
+                        });
+                    })()}
+                 </div>
+                 <p className="text-center text-slate-400 text-xs mt-2 font-bold uppercase">Klicka på bokstäverna i rätt ordning</p>
+             </div>
+          )}
+
+          {/* Case 2: Typing Mode (Full Keyboard) */}
+          {mode === GameMode.TYPING && (
               <div className="max-w-2xl mx-auto flex flex-wrap justify-center gap-1">
                   {"ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ".split('').map(char => (
                       <button
@@ -607,8 +768,16 @@ export default function App() {
                       </button>
                   ))}
               </div>
-          </div>
-      )}
+          )}
+
+          {/* Case 3: No Active Word or Drag Word mode */}
+          {(mode === GameMode.DRAG_WORDS || (mode === GameMode.DRAG_LETTERS && !activeWordId)) && (
+             <p className="text-center text-slate-400 font-bold text-sm">
+                {mode === GameMode.DRAG_WORDS ? "Dra bilderna till rätt ruta" : "Klicka på en rad för att börja"}
+             </p>
+          )}
+
+      </div>
     </div>
   );
 }
