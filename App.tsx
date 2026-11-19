@@ -51,6 +51,9 @@ export default function App() {
   const [solvedWords, setSolvedWords] = useState<string[]>([]);
   const [userInputs, setUserInputs] = useState<Record<string, string>>({});
   const [activeWordId, setActiveWordId] = useState<string | null>(null);
+  // DRAG_WORDS pa iPad: HTML5-drag fungerar inte med fingret, sa man trycker
+  // forst pa en bild och sedan pa rutan. Samma sak fungerar med mus.
+  const [selectedWordId, setSelectedWordId] = useState<string | null>(null);
   const [showSolvedHighlight, setShowSolvedHighlight] = useState(true);
   
   // State to track if a saved game exists
@@ -207,6 +210,7 @@ export default function App() {
   };
 
   const handleDropWord = (wordId: string) => {
+    setSelectedWordId(null);
     if (!solvedWords.includes(wordId)) {
         setSolvedWords(prev => [...prev, wordId]);
         // Also fill in the inputs for visual completeness
@@ -683,6 +687,8 @@ export default function App() {
                             key={w.id} 
                             wordData={w} 
                             isSolved={solvedWords.includes(w.id)} 
+                            selected={selectedWordId === w.id}
+                            onSelect={(id) => setSelectedWordId(prev => prev === id ? null : id)}
                         />
                     ))}
                 </div>
@@ -700,6 +706,7 @@ export default function App() {
                     activeWordId={activeWordId}
                     onCellClick={handleCellClick}
                     onDropWord={handleDropWord}
+                    selectedWordId={selectedWordId}
                     showSolvedHighlight={showSolvedHighlight}
                  />
              )}
@@ -772,7 +779,7 @@ export default function App() {
           {/* Case 3: No Active Word or Drag Word mode */}
           {(mode === GameMode.DRAG_WORDS || (mode === GameMode.DRAG_LETTERS && !activeWordId)) && (
              <p className="text-center text-slate-400 font-bold text-sm">
-                {mode === GameMode.DRAG_WORDS ? "Dra bilderna till rätt ruta" : "Klicka på en rad för att börja"}
+                {mode === GameMode.DRAG_WORDS ? "Tryck på en bild och sedan på rätt ruta" : "Klicka på en rad för att börja"}
              </p>
           )}
 
