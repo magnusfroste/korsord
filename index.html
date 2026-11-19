@@ -135,7 +135,7 @@
       s.setAttribute('aria-hidden', 'true');
       setTimeout(function () { s.remove(); }, 240);
       var to = s.getAttribute('data-play-href');
-      if (to) { location.href = to; }
+      if (to && to !== '/' && to !== location.pathname) { location.href = to; }
       document.dispatchEvent(new CustomEvent('startskarm:spela'));
     });
   })();
