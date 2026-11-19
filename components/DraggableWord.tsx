@@ -23,13 +23,10 @@ export const DraggableWord: React.FC<DraggableWordProps> = ({ wordData, isSolved
         flex flex-col items-center gap-2 w-32 shrink-0 shadow-md hover:scale-105 transition-transform
       "
     >
-      <div className="w-24 h-24 bg-slate-100 rounded-lg overflow-hidden relative">
-        <img 
-            src={`https://image.pollinations.ai/prompt/${wordData.imageKeyword}?width=200&height=200&nologo=true&seed=${wordData.id}`} 
-            alt={wordData.word}
-            className="w-full h-full object-cover"
-            loading="lazy"
-        />
+      <div className="w-24 h-24 bg-slate-100 rounded-lg overflow-hidden relative flex items-center justify-center">
+        <span className="text-6xl leading-none select-none" aria-hidden="true">
+          {wordData.emoji || '🧩'}
+        </span>
       </div>
       <span className="font-black text-xl text-slate-700 uppercase tracking-widest">{wordData.word}</span>
     </div>

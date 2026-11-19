@@ -21,7 +21,8 @@ export interface WordPosition {
   id: string;
   word: string;
   clue: string;
-  imageKeyword: string; // Used to generate the image URL
+  imageKeyword: string; // används inte längre, bilder är emojis
+  emoji?: string;
   row: number; // 0-indexed
   col: number; // 0-indexed
   direction: 'across' | 'down';

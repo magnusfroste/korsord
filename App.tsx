@@ -666,11 +666,10 @@ export default function App() {
                      </p>
                      {/* Show image hint for typing modes too if needed */}
                      {mode !== GameMode.DRAG_WORDS && (
-                        <div className="w-24 h-24 rounded-lg overflow-hidden bg-slate-200 border-2 border-white shadow-sm">
-                             <img 
-                                src={`https://image.pollinations.ai/prompt/${puzzle?.words.find(w => w.id === activeWordId)?.imageKeyword}?width=100&height=100&nologo=true`} 
-                                className="w-full h-full object-cover"
-                            />
+                        <div className="w-24 h-24 rounded-lg bg-slate-100 border-2 border-white shadow-sm flex items-center justify-center">
+                             <span className="text-5xl leading-none select-none" aria-hidden="true">
+                                {puzzle?.words.find(w => w.id === activeWordId)?.emoji || '🧩'}
+                             </span>
                         </div>
                      )}
                 </div>
