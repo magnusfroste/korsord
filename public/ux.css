@@ -45,14 +45,17 @@ svg {
   -webkit-user-drag: none;
 }
 
-/* ---- 3. Träffyta ------------------------------------------------------- */
+/* ---- 3. Träffyta: 44×44 px på allt man trycker på ---------------------- */
 button,
 [role="button"] {
   min-height: var(--ux-tap);
-}
-button[class*="icon"],
-[role="button"][class*="icon"] {
   min-width: var(--ux-tap);
+}
+nav a,
+footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--ux-tap);
 }
 
 /* ---- 4. Läsbar text: små Tailwind-steg lyfts till barnnivå ------------- */
