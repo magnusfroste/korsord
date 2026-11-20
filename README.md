@@ -6,6 +6,8 @@ vanligt korsord.
 
 **Spela:** https://korsord.skolappar.com · En del av [Skolappar](https://www.skolappar.com) – pedagogiska appar av föräldrar · öppen källkod (MIT)
 
+![Korsord](public/kort.png)
+
 Började som ett Google AI Studio-projekt och körs nu fristående. Korsorden byggdes först av
 Gemini; nu skapas de lokalt från en egen ordbank.
 
