@@ -1,0 +1,101 @@
+/* ux.css — gemensamt UX-lager för skolapparnas spel.
+   Tre saker, inget mer:
+   1) träffytor minst 44×44 px (Apple HIG, barns fingrar är mindre exakta),
+   2) läsbar text: inget under 15 px i speltext,
+   3) inget iPad-strul: dubbeltryckszoom, långtrycksmeny, bilddrag,
+      gummisnoddsscroll och 300 ms fördröjning på tryck.
+   Inga färger, inga skuggor, inga ramar — appens eget utseende är orört. */
+
+:root {
+  --ux-tap: 44px;
+}
+
+/* ---- 1. Touch: tryck ska kännas direkt ---------------------------------- */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  overscroll-behavior: none;
+  -webkit-touch-callout: none;
+}
+button,
+a,
+[role="button"],
+input,
+select,
+textarea,
+label {
+  touch-action: manipulation; /* ingen 300 ms väntan, ingen dubbeltryckszoom */
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+/* ---- 2. Ingen oavsiktlig textmarkering eller bilddrag ------------------ */
+button,
+[role="button"],
+.btn,
+img,
+svg,
+canvas {
+  -webkit-user-select: none;
+  user-select: none;
+}
+img,
+svg {
+  -webkit-user-drag: none;
+}
+
+/* ---- 3. Träffyta ------------------------------------------------------- */
+button,
+[role="button"] {
+  min-height: var(--ux-tap);
+}
+button[class*="icon"],
+[role="button"][class*="icon"] {
+  min-width: var(--ux-tap);
+}
+
+/* ---- 4. Läsbar text: små Tailwind-steg lyfts till barnnivå ------------- */
+.text-xs,
+.text-\[10px\],
+.text-\[11px\],
+.text-\[12px\],
+.text-\[13px\] {
+  font-size: 0.9375rem !important; /* 15 px */
+  line-height: 1.35 !important;
+}
+.text-sm {
+  font-size: 1rem !important; /* 16 px */
+  line-height: 1.4 !important;
+}
+small {
+  font-size: 0.875rem !important;
+}
+
+/* ---- 5. Fokus ska synas (tangentbord, switch, ögonstyrning) ------------ */
+:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 2px;
+}
+
+/* ---- 6. Tryck ska bekräftas visuellt, även utan hover ------------------ */
+@media (hover: none) {
+  button:active,
+  [role="button"]:active,
+  .btn:active,
+  a:active {
+    filter: brightness(0.92);
+  }
+}
+
+/* ---- 7. Respektera inställningen "minska rörelse" ---------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
