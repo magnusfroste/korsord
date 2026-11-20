@@ -1,1 +1,23 @@
-{"name": "Korsord", "short_name": "Korsord", "description": "Korsord för barn: dra bilder och bokstäver till rätt ruta, eller skriv orden själv. Fyra teman – djur, skolan, rymden och historia – med ledtrådar på svenska. Fungerar helt utan nät och utan konto.", "start_url": "/", "display": "standalone", "background_color": "#0891b2", "theme_color": "#0891b2", "icons": [{"src": "/icon-512.png", "sizes": "512x512", "type": "image/png"}, {"src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml"}]}
+{
+  "name": "Korsord",
+  "short_name": "Korsord",
+  "description": "Korsord för barn: dra bilder och bokstäver till rätt ruta, eller skriv orden själv. Fyra teman – djur, skolan, rymden och historia – med ledtrådar på svenska. Fungerar helt utan nät och utan konto.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0891b2",
+  "theme_color": "#0891b2",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "scope": "/",
+  "lang": "sv"
+}
