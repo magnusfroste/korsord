@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { generatePuzzle } from './services/geminiService';
+import { generatePuzzle } from './services/wordService';
 import { GameMode, AgeGroup, PuzzleData, UserProgress, DifficultyLevel } from './types';
 import { Grid } from './components/Grid';
 import { DraggableWord } from './components/DraggableWord';

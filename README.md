@@ -56,7 +56,7 @@ Servern ligger bakom nginx med `deploy/nginx.conf`.
 App.tsx                     menyer, spelsätt, ledtrådar, XP och mynt, sparning
 data/wordBank.ts            ordbanken: sju teman med ord, ledtråd och emoji
 lib/crossword.ts            bygger rutnätet av orden
-services/geminiService.ts   väljer tema och antal ord (namnet är kvar, ingen Gemini)
+services/wordService.ts     väljer tema och antal ord
 components/Grid.tsx         rutnätet
 components/DraggableWord.tsx ordkort att dra eller trycka på
 deploy/nginx.conf           nginx-konfiguration
