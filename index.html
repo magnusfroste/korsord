@@ -1,68 +1,163 @@
 <!DOCTYPE html>
 <html lang="sv">
   <head>
+    <!-- SELFHOST-HEAD -->
+    <title>Korsord – lös korsord – dra bokstäverna rätt</title>
+    <meta name="description" content="Korsord för barn: dra bilder och bokstäver till rätt ruta, eller skriv orden själv. Fyra teman – djur, skolan, rymden och historia – med ledtrådar på svenska. Fungerar helt utan nät och utan konto." />
+    <link rel="canonical" href="https://korsord.skolappar.com" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="author" content="Skolappar" />
+    <meta name="theme-color" content="#0891b2" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Skolappar" />
+    <meta property="og:locale" content="sv_SE" />
+    <meta property="og:url" content="https://korsord.skolappar.com" />
+    <meta property="og:title" content="Korsord – lös korsord – dra bokstäverna rätt" />
+    <meta property="og:description" content="Korsord för barn: dra bilder och bokstäver till rätt ruta, eller skriv orden själv. Fyra teman – djur, skolan, rymden och historia – med ledtrådar på svenska. Fungerar helt utan nät och utan konto." />
+    <meta property="og:image" content="https://korsord.skolappar.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Korsord" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Korsord – lös korsord – dra bokstäverna rätt" />
+    <meta name="twitter:description" content="Korsord för barn: dra bilder och bokstäver till rätt ruta, eller skriv orden själv. Fyra teman – djur, skolan, rymden och historia – med ledtrådar på svenska. Fungerar helt utan nät och utan konto." />
+    <meta name="twitter:image" content="https://korsord.skolappar.com/og.png" />
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Korsord", "description": "Korsord för barn: dra bilder och bokstäver till rätt ruta, eller skriv orden själv. Fyra teman – djur, skolan, rymden och historia – med ledtrådar på svenska. Fungerar helt utan nät och utan konto.", "url": "https://korsord.skolappar.com", "applicationCategory": "EducationalApplication", "applicationSubCategory": "Ordspel", "operatingSystem": "Webbläsare", "inLanguage": "sv-SE", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "SEK"}, "publisher": {"@type": "Organization", "name": "Skolappar", "url": "https://www.skolappar.com"}, "audience": {"@type": "EducationalAudience", "educationalRole": "student", "audienceType": "Åk 1 till 6"}, "learningResourceType": "Ord och stavning"}</script>
+    <!-- /SELFHOST-HEAD -->
+
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>KorsordsÄventyret</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              brand: {
-                light: '#a5f3fc',
-                DEFAULT: '#0891b2',
-                dark: '#164e63',
-              },
-              accent: {
-                yellow: '#fcd34d',
-                orange: '#f97316',
-                pink: '#f472b6',
-                green: '#4ade80'
-              }
-            },
-            animation: {
-              'bounce-slow': 'bounce 3s infinite',
-              'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            }
-          }
-        }
-      }
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <style>
-      /* Custom scrollbar for better kid-friendly look */
-      ::-webkit-scrollbar {
-        width: 10px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #0891b2; 
-        border-radius: 5px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #164e63; 
-      }
-      body {
-        overscroll-behavior: none; /* Prevent pull-to-refresh on mobile */
-      }
+      /* Anpassad scrollbar för ett barnvänligt intryck */
+      ::-webkit-scrollbar { width: 10px; }
+      ::-webkit-scrollbar-track { background: #f1f1f1; }
+      ::-webkit-scrollbar-thumb { background: #0891b2; border-radius: 5px; }
+      ::-webkit-scrollbar-thumb:hover { background: #164e63; }
+      body { overscroll-behavior: none; }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.2.2/",
-    "react": "https://esm.sh/react@^19.2.2",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.2/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.33.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.560.0"
-  }
-}
-</script>
+  <style>
+/* Fredoka - Skolappar-typsnitt */
+@font-face { font-family: 'Fredoka'; font-weight: 400; font-style: normal; font-display: swap; src: url('/fonts/fredoka-400.ttf') format('truetype'); }
+@font-face { font-family: 'Fredoka'; font-weight: 500; font-style: normal; font-display: swap; src: url('/fonts/fredoka-500.ttf') format('truetype'); }
+@font-face { font-family: 'Fredoka'; font-weight: 600; font-style: normal; font-display: swap; src: url('/fonts/fredoka-600.ttf') format('truetype'); }
+@font-face { font-family: 'Fredoka'; font-weight: 700; font-style: normal; font-display: swap; src: url('/fonts/fredoka-700.ttf') format('truetype'); }
+</style>
+  <!-- ux-lager --><link rel="stylesheet" href="/ux.css">
+  <!-- pwa -->  <meta name="apple-mobile-web-app-title" content="Korsord">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
   <body class="bg-slate-100 text-slate-800 antialiased overflow-hidden select-none">
     <div id="root"></div>
-      <script type="module" src="/index.tsx"></script>
-  </body>
+    <script type="module" src="/index.tsx"></script>
+  <!-- START:startskarm -->
+<style>
+  #startskarm {
+    position: fixed; inset: 0; z-index: 2147483000;
+    background: #faf7f2; color: #14181f;
+    font-family: "Fredoka", "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: grid; place-items: center;
+    padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+    overflow: auto;
+    opacity: 1; transition: opacity .22s ease;
+  }
+  #startskarm.dold { opacity: 0; pointer-events: none; }
+  #startskarm .start {
+    width: 100%; max-width: 620px; display: flex; flex-direction: column;
+    align-items: center; text-align: center;
+  }
+  #startskarm .tile {
+    width: clamp(84px, 13vmin, 120px); height: clamp(84px, 13vmin, 120px);
+    border-radius: 26%; background: #dde9e8;
+    box-shadow: 0 10px 30px -14px rgba(20,24,31,.35), inset 0 0 0 1px rgba(20,24,31,.06);
+    display: grid; place-items: center; overflow: hidden;
+  }
+  #startskarm .tile img { width: 100%; height: 100%; display: block; }
+  #startskarm h1 {
+    margin: clamp(18px, 3.2vmin, 30px) 0 0;
+    font-size: clamp(38px, 7.4vmin, 68px); line-height: 1.02;
+    letter-spacing: -0.028em; font-weight: 800; color: #14181f;
+  }
+  #startskarm .tag {
+    margin: clamp(8px, 1.4vmin, 14px) 0 0;
+    font-size: clamp(16px, 2.35vmin, 23px); line-height: 1.35;
+    color: #4a5260; max-width: 34ch;
+  }
+  #startskarm .chips {
+    list-style: none; display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 8px; padding: 0; margin: clamp(16px, 2.6vmin, 24px) 0 0;
+  }
+  #startskarm .chips li {
+    font-size: clamp(12px, 1.5vmin, 14px); font-weight: 600; letter-spacing: .01em;
+    padding: 7px 13px; border-radius: 999px; color: #0e5f75; background: #dde9e8;
+  }
+  #startskarm .play {
+    display: inline-flex; align-items: center; gap: 12px;
+    margin-top: clamp(24px, 4vmin, 38px);
+    padding: clamp(15px, 2.1vmin, 20px) clamp(34px, 5.4vmin, 52px);
+    border: 0; border-radius: 999px; background: #0b809e; color: #fff;
+    font: inherit; font-size: clamp(18px, 2.4vmin, 24px); font-weight: 700;
+    letter-spacing: -0.01em; cursor: pointer;
+    box-shadow: 0 14px 28px -14px #0b809e99;
+    transition: transform .16s ease; -webkit-tap-highlight-color: transparent;
+  }
+  #startskarm .play:hover { transform: translateY(-1px); }
+  #startskarm .play:active { transform: scale(.985); }
+  #startskarm .play svg { width: 1em; height: 1em; }
+  #startskarm .note {
+    margin: clamp(18px, 2.6vmin, 26px) 0 0;
+    font-size: clamp(12px, 1.5vmin, 14px); color: #4a5260; opacity: .8;
+  }
+  #startskarm .note a { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(74,82,96,.3); }
+  @media (max-height: 470px) {
+    #startskarm h1 { font-size: clamp(30px, 6vmin, 44px); }
+    #startskarm .tag, #startskarm .note { display: none; }
+    #startskarm .play { margin-top: 20px; }
+  }
+</style>
+<div id="startskarm" role="dialog" aria-label="Korsord" data-play-href="/">
+  <div class="start">
+    <div class="tile"><img src="/icon-512.png" alt="" width="512" height="512"></div>
+    <h1>Korsord</h1>
+    <p class="tag">lös korsord – dra bokstäverna rätt</p>
+    <ul class="chips"><li>Ordspel</li><li>Ord</li><li>Åk 1 till 6</li></ul>
+    <button class="play" type="button" data-play-href="/">
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11-6.86a1 1 0 0 0 0-1.7l-11-6.86A1 1 0 0 0 8 5.14Z"/></svg>
+      Spela
+    </button>
+    <p class="note">Gratis · ingen inloggning · <a href="https://www.skolappar.com">skolappar.com</a></p>
+  </div>
+</div>
+<script>
+  (function () {
+    var s = document.getElementById('startskarm');
+    var path = location.pathname.replace(/index[.]html$/, '');
+    if (path !== '/' && path !== '') { s.remove(); return; }
+    var d = document.documentElement, b = document.body;
+    var prev = [d.style.overflow, b.style.overflow];
+    d.style.overflow = 'hidden'; b.style.overflow = 'hidden';
+    s.querySelector('.play').addEventListener('click', function () {
+      d.style.overflow = prev[0]; b.style.overflow = prev[1];
+      s.classList.add('dold');
+      s.setAttribute('aria-hidden', 'true');
+      setTimeout(function () { s.remove(); }, 240);
+      var to = s.getAttribute('data-play-href');
+      if (to && to !== '/' && to !== location.pathname) { location.href = to; }
+      document.dispatchEvent(new CustomEvent('startskarm:spela'));
+    });
+  })();
+</script>
+<!-- SLUT:startskarm -->
+<style>
+/* Fredoka - gäller hela appen */
+html, body, button, input, select, textarea {
+  font-family: 'Fredoka', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+</style>
+</body>
 </html>

@@ -9,6 +9,8 @@ interface GridProps {
   activeWordId: string | null;
   onCellClick: (row: number, col: number) => void;
   onDropWord: (wordId: string) => void; // For Drag Words mode
+  /** Vald bild i DRAG_WORDS: gor att man kan trycka bild -> ruta pa iPad. */
+  selectedWordId?: string | null;
   showSolvedHighlight: boolean;
 }
 
@@ -20,6 +22,7 @@ export const Grid: React.FC<GridProps> = ({
   activeWordId, 
   onCellClick,
   onDropWord,
+  selectedWordId,
   showSolvedHighlight
 }) => {
   // Create a 2D map of the grid to easily find what letter belongs where
@@ -153,7 +156,14 @@ export const Grid: React.FC<GridProps> = ({
           cursor-pointer
         `}
         style={animationStyle}
-        onClick={() => onCellClick(r, c)}
+        onClick={() => {
+          // Tryck pa en ruta: i DRAG_WORDS lagger vi ordet har om bilden ar vald.
+          if (mode === GameMode.DRAG_WORDS && selectedWordId && !isAnyWordSolved && cellData.wordIds.includes(selectedWordId)) {
+            onDropWord(selectedWordId);
+            return;
+          }
+          onCellClick(r, c);
+        }}
         onDragOver={isDragTarget ? handleDragOver : undefined}
         onDrop={isDragTarget ? (e) => handleDrop(e, cellData.wordObj?.id) : undefined}
       >

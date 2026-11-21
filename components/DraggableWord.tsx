@@ -4,9 +4,12 @@ import { WordPosition } from '../types';
 interface DraggableWordProps {
   wordData: WordPosition;
   isSolved: boolean;
+  /** Tryck (utan att dra) valjer bilden - fungerar pa iPad dar HTML5-drag inte finns. */
+  onSelect?: (wordId: string) => void;
+  selected?: boolean;
 }
 
-export const DraggableWord: React.FC<DraggableWordProps> = ({ wordData, isSolved }) => {
+export const DraggableWord: React.FC<DraggableWordProps> = ({ wordData, isSolved, onSelect, selected }) => {
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData("text/plain", wordData.id);
     e.dataTransfer.effectAllowed = "move";
@@ -15,23 +18,25 @@ export const DraggableWord: React.FC<DraggableWordProps> = ({ wordData, isSolved
   if (isSolved) return null;
 
   return (
-    <div
+    <button
+      type="button"
       draggable
       onDragStart={handleDragStart}
-      className="
-        bg-white border-b-4 border-slate-200 rounded-xl p-2 m-2 cursor-grab active:cursor-grabbing
-        flex flex-col items-center gap-2 w-32 shrink-0 shadow-md hover:scale-105 transition-transform
-      "
+      onClick={() => onSelect?.(wordData.id)}
+      aria-pressed={!!selected}
+      className={`
+        bg-white border-b-4 rounded-xl p-2 m-2 cursor-pointer select-none
+        flex flex-col items-center gap-2 w-32 shrink-0 shadow-md transition-transform
+        active:scale-95
+        ${selected ? 'border-amber-400 ring-4 ring-amber-300 scale-105' : 'border-slate-200 hover:scale-105'}
+      `}
     >
-      <div className="w-24 h-24 bg-slate-100 rounded-lg overflow-hidden relative">
-        <img 
-            src={`https://image.pollinations.ai/prompt/${wordData.imageKeyword}?width=200&height=200&nologo=true&seed=${wordData.id}`} 
-            alt={wordData.word}
-            className="w-full h-full object-cover"
-            loading="lazy"
-        />
+      <div className="w-24 h-24 bg-slate-100 rounded-lg overflow-hidden relative flex items-center justify-center">
+        <span className="text-6xl leading-none select-none" aria-hidden="true">
+          {wordData.emoji || '🧩'}
+        </span>
       </div>
       <span className="font-black text-xl text-slate-700 uppercase tracking-widest">{wordData.word}</span>
-    </div>
+    </button>
   );
 };
