@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { generatePuzzle } from './services/geminiService';
+import { generatePuzzle } from './services/wordService';
 import { GameMode, AgeGroup, PuzzleData, UserProgress, DifficultyLevel } from './types';
 import { Grid } from './components/Grid';
 import { DraggableWord } from './components/DraggableWord';
@@ -51,6 +51,9 @@ export default function App() {
   const [solvedWords, setSolvedWords] = useState<string[]>([]);
   const [userInputs, setUserInputs] = useState<Record<string, string>>({});
   const [activeWordId, setActiveWordId] = useState<string | null>(null);
+  // DRAG_WORDS pa iPad: HTML5-drag fungerar inte med fingret, sa man trycker
+  // forst pa en bild och sedan pa rutan. Samma sak fungerar med mus.
+  const [selectedWordId, setSelectedWordId] = useState<string | null>(null);
   const [showSolvedHighlight, setShowSolvedHighlight] = useState(true);
   
   // State to track if a saved game exists
@@ -207,6 +210,7 @@ export default function App() {
   };
 
   const handleDropWord = (wordId: string) => {
+    setSelectedWordId(null);
     if (!solvedWords.includes(wordId)) {
         setSolvedWords(prev => [...prev, wordId]);
         // Also fill in the inputs for visual completeness
@@ -666,11 +670,10 @@ export default function App() {
                      </p>
                      {/* Show image hint for typing modes too if needed */}
                      {mode !== GameMode.DRAG_WORDS && (
-                        <div className="w-24 h-24 rounded-lg overflow-hidden bg-slate-200 border-2 border-white shadow-sm">
-                             <img 
-                                src={`https://image.pollinations.ai/prompt/${puzzle?.words.find(w => w.id === activeWordId)?.imageKeyword}?width=100&height=100&nologo=true`} 
-                                className="w-full h-full object-cover"
-                            />
+                        <div className="w-24 h-24 rounded-lg bg-slate-100 border-2 border-white shadow-sm flex items-center justify-center">
+                             <span className="text-5xl leading-none select-none" aria-hidden="true">
+                                {puzzle?.words.find(w => w.id === activeWordId)?.emoji || '🧩'}
+                             </span>
                         </div>
                      )}
                 </div>
@@ -684,6 +687,8 @@ export default function App() {
                             key={w.id} 
                             wordData={w} 
                             isSolved={solvedWords.includes(w.id)} 
+                            selected={selectedWordId === w.id}
+                            onSelect={(id) => setSelectedWordId(prev => prev === id ? null : id)}
                         />
                     ))}
                 </div>
@@ -701,6 +706,7 @@ export default function App() {
                     activeWordId={activeWordId}
                     onCellClick={handleCellClick}
                     onDropWord={handleDropWord}
+                    selectedWordId={selectedWordId}
                     showSolvedHighlight={showSolvedHighlight}
                  />
              )}
@@ -773,7 +779,7 @@ export default function App() {
           {/* Case 3: No Active Word or Drag Word mode */}
           {(mode === GameMode.DRAG_WORDS || (mode === GameMode.DRAG_LETTERS && !activeWordId)) && (
              <p className="text-center text-slate-400 font-bold text-sm">
-                {mode === GameMode.DRAG_WORDS ? "Dra bilderna till rätt ruta" : "Klicka på en rad för att börja"}
+                {mode === GameMode.DRAG_WORDS ? "Tryck på en bild och sedan på rätt ruta" : "Klicka på en rad för att börja"}
              </p>
           )}
 
