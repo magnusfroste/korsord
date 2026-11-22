@@ -114,9 +114,42 @@
     font-size: clamp(12px, 1.5vmin, 14px); color: #4a5260; opacity: .8;
   }
   #startskarm .note a { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(74,82,96,.3); }
+  #startskarm .lgr22 {
+    margin: clamp(14px, 2.2vmin, 20px) 0 0; max-width: 46ch;
+    font-size: clamp(12px, 1.45vmin, 13.5px); color: #4a5260;
+    text-align: left;
+  }
+  #startskarm .lgr22 summary {
+    list-style: none; cursor: pointer; text-align: center;
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    opacity: .72; padding: 6px 2px; border-radius: 8px;
+  }
+  #startskarm .lgr22 summary::-webkit-details-marker { display: none; }
+  #startskarm .lgr22 summary:hover, #startskarm .lgr22 summary:focus-visible { opacity: 1; }
+  #startskarm .lgr22 summary:focus-visible { outline: 2px solid #0b809e66; outline-offset: 2px; }
+  #startskarm .lgr22-info {
+    width: 15px; height: 15px; border-radius: 50%; display: grid; place-items: center;
+    background: #dde9e8; color: #0e5f75; font-size: 10px; font-weight: 700;
+    font-style: normal; line-height: 1; flex: 0 0 auto;
+  }
+  #startskarm .lgr22-pil { transition: transform .18s ease; font-size: .9em; }
+  #startskarm .lgr22[open] summary { opacity: 1; }
+  #startskarm .lgr22[open] .lgr22-pil { transform: rotate(90deg); }
+  #startskarm .lgr22-kropp {
+    margin-top: 10px; padding: 10px 12px; border-radius: 12px;
+    background: #dde9e8; line-height: 1.45;
+  }
+  #startskarm .lgr22-kropp p { margin: 0; }
+  #startskarm .lgr22-amne { font-weight: 600; color: #0e5f75; }
+  #startskarm .lgr22-kropp blockquote {
+    margin: 7px 0 0; padding-left: 10px; border-left: 2px solid #0b809e44;
+    font-style: italic;
+  }
+  #startskarm .lgr22-kalla { margin-top: 5px !important; font-size: .92em; opacity: .75; }
+  #startskarm .lgr22-koppling { margin-top: 8px !important; }
   @media (max-height: 470px) {
     #startskarm h1 { font-size: clamp(30px, 6vmin, 44px); }
-    #startskarm .tag, #startskarm .note { display: none; }
+    #startskarm .tag, #startskarm .note, #startskarm .lgr22 { display: none; }
     #startskarm .play { margin-top: 20px; }
   }
 </style>
@@ -131,6 +164,14 @@
       Spela
     </button>
     <p class="note">Gratis · ingen inloggning · <a href="https://www.skolappar.com">skolappar.com</a></p>
+    <details class="lgr22">
+      <summary><span class="lgr22-info" aria-hidden="true">i</span>Koppling till läroplanen (Lgr22)<span class="lgr22-pil" aria-hidden="true">›</span></summary>
+      <div class="lgr22-kropp">
+        <p class="lgr22-amne">Svenska · Åk 1 till 6</p>
+        <blockquote>”Alfabetet och alfabetisk ordning.”<span class="lgr22-kalla"> Lgr22, centralt innehåll åk 1–3.</span></blockquote><blockquote>”Språkliga strukturer och normer. Grundläggande skrivregler, med gemener och versaler, de vanligaste skiljetecknen samt stavning av vanligt förekommande ord i elevnära texter.”<span class="lgr22-kalla"> Lgr22, centralt innehåll åk 1–3.</span></blockquote>
+        <p class="lgr22-koppling"><strong>Så tränas det:</strong> Bokstäverna ska på plats i rätt ordning, och ordet ska stavas rätt för att passa in.</p>
+      </div>
+    </details>
   </div>
 </div>
 <script>
