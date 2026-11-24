@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { generatePuzzle } from './services/wordService';
 import { GameMode, AgeGroup, PuzzleData, UserProgress, DifficultyLevel } from './types';
 import { Grid } from './components/Grid';
 import { DraggableWord } from './components/DraggableWord';
 import { Button } from './components/ui/Button';
+import { report } from './lib/skolappar';
 import { Trophy, Star, ArrowLeft, Settings, Play, Brain, Sparkles, Zap, Eye, EyeOff, HelpCircle, History, Lightbulb, Info, RotateCcw } from 'lucide-react';
 
 // --- Constants ---
@@ -16,6 +17,8 @@ const INITIAL_PROGRESS: UserProgress = {
 };
 
 const SAVED_GAME_KEY = 'korsord_saved_game';
+// The four age groups are the game's stages (1–4), reported as the level.
+const STAGES = [AgeGroup.SIX, AgeGroup.EIGHT, AgeGroup.TEN, AgeGroup.TWELVE];
 const HINT_COST = 10;
 
 // Simple seeded shuffle to keep letters consistent during re-renders
@@ -61,6 +64,8 @@ export default function App() {
   
   // State for teacher info toggle
   const [showInfo, setShowInfo] = useState(false);
+  // Words in the current puzzle that needed a hint (for the round's result).
+  const hintedWords = useRef<Set<string>>(new Set());
 
   // Determine mode based on Age
   const getMode = (age: AgeGroup): GameMode => {
@@ -126,6 +131,9 @@ export default function App() {
       setUserInputs({});
       setActiveWordId(null);
       setView('GAME');
+      hintedWords.current = new Set();
+      report('round_start');
+      report('level', STAGES.indexOf(age) + 1);
       // Clearing old save happens automatically when the useEffect fires with new puzzle data
     } catch (e) {
       alert("Kunde inte ladda spelet. Försök igen!");
@@ -177,6 +185,9 @@ export default function App() {
 
   const handleWin = () => {
     setView('WIN');
+    if (puzzle && puzzle.words.length) {
+      report('round_done', Math.round((puzzle.words.length - hintedWords.current.size) / puzzle.words.length * 100));
+    }
     
     // Clear saved game on win so they start fresh next time
     localStorage.removeItem(SAVED_GAME_KEY);
@@ -244,6 +255,8 @@ export default function App() {
         if (!solvedWords.includes(word.id)) {
             handleDropWord(word.id);
             setProgress(prev => ({ ...prev, coins: prev.coins - HINT_COST }));
+            hintedWords.current.add(word.id);
+            report('hint');
             setActiveWordId(null);
         }
     } else {
@@ -268,6 +281,8 @@ export default function App() {
             const newInputs = { ...userInputs, [targetCoord]: charToFill };
             setUserInputs(newInputs);
             setProgress(prev => ({ ...prev, coins: prev.coins - HINT_COST }));
+            hintedWords.current.add(word.id);
+            report('hint');
 
             // Check if word is now complete
             checkWordCompletion(word, newInputs);
@@ -319,6 +334,11 @@ export default function App() {
           const newInputs = { ...userInputs, [key]: char };
           setUserInputs(newInputs);
           checkWordCompletion(word, newInputs);
+          // The word is full but wrong: the child has to try again.
+          const letters = Array.from(word.word, (_, i) => newInputs[word.direction === 'across' ? `${word.row}-${word.col + i}` : `${word.row + i}-${word.col}`]);
+          if (letters.every(Boolean) && letters.join('') !== word.word) {
+              report('hint');
+          }
       }
   };
 
