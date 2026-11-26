@@ -4,7 +4,7 @@ Korsord på svenska för åk 1 till 6. Barnet löser korsord med emoji-bilder oc
 yngsta drar hela ord till rätt rad, de lite äldre lägger bokstäver och de äldsta skriver som i ett
 vanligt korsord.
 
-**Spela:** https://korsord.skolappar.com · En del av [Skolappar](https://www.skolappar.com) – pedagogiska appar av föräldrar · öppen källkod (MIT)
+**Spela:** https://korsord.skolappar.org · En del av [Skolappar](https://www.skolappar.org) – pedagogiska appar av föräldrar · öppen källkod (MIT)
 
 ![Korsord](public/kort.png)
 

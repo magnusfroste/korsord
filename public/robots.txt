@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://korsord.skolappar.com/sitemap.xml
+Sitemap: https://korsord.skolappar.org/sitemap.xml
